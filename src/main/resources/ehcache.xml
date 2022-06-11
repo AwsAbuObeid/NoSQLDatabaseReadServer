@@ -7,7 +7,7 @@
     <diskStore path="java.io.tmpdir" />
 
     <cache name="collections"
-           maxBytesLocalHeap="1g"
+           maxBytesLocalHeap="500m"
            eternal="false"
            memoryStoreEvictionPolicy="LRU"
            transactionalMode="off">
@@ -21,7 +21,7 @@
         <persistence strategy="none" />
     </cache>
     <cache name="queries"
-           maxBytesLocalHeap="1g"
+           maxBytesLocalHeap="500m"
            eternal="false"
            maxEntriesLocalHeap="0"
            memoryStoreEvictionPolicy="LFU"
