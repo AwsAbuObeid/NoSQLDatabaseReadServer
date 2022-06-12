@@ -1,7 +1,6 @@
 package com.nosqldb.readserver.requesthandlers.queryutils;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import java.io.IOException;
 

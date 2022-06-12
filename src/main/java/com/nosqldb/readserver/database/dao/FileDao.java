@@ -5,11 +5,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.nosqldb.readserver.database.fileservice.FileService;
-import com.nosqldb.readserver.database.fileservice.FileServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 
 import java.io.File;
@@ -32,7 +30,7 @@ public class FileDao implements DocumentDao {
 
     Logger logger= LoggerFactory.getLogger(FileDao.class);
 
-    public FileDao() {
+    private FileDao() {
         mapper = new ObjectMapper();
     }
 

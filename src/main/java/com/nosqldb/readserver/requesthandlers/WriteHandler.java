@@ -22,7 +22,7 @@ public class WriteHandler {
     @Autowired
     DocumentDao dao;
 
-    public void executeWrite(ObjectNode body) throws IOException {
+    public synchronized void executeWrite(ObjectNode body) throws IOException {
         Operation op= Enum.valueOf(Operation.class,body.get("op").asText());
 
         switch (op) {

@@ -3,6 +3,7 @@ package com.nosqldb.readserver.security;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * The APIkeyRecord class keeps a log of all the available API keys and the associated
@@ -12,16 +13,13 @@ import java.util.HashMap;
 @Service
 public class APIkeyRecord {
     private static final String Controller_API_key="Controller_API_key";
-    private static final HashMap<String,String> securityKeys=fillKeys();
-    private static HashMap<String, String> fillKeys() {
-        HashMap<String, String> x = new HashMap<>();
-        x.put("123456789","StudentDB");
-        x.put("234567891","StudentDB");
-        x.put("345678912","StudentDB");
-        return x;
+    private static  ConcurrentHashMap<String,String> securityKeys;
+
+    public APIkeyRecord() {
+        securityKeys=new ConcurrentHashMap<>();
     }
 
-    public void addKey(String securityKey,String DB){
+    public void addKey(String securityKey, String DB){
         securityKeys.put(securityKey, DB);
     }
 

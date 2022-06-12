@@ -17,6 +17,9 @@ import java.nio.file.Paths;
 public class FileServiceImpl implements FileService {
     public static final String DATA_PATH = "Data/";
 
+    private FileServiceImpl() {
+    }
+
     @Override
     public File getCollectionFile(String DB, String colName) {
         new File(DATA_PATH + DB).mkdirs();
