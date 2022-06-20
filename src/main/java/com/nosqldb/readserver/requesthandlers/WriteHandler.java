@@ -1,14 +1,13 @@
 package com.nosqldb.readserver.requesthandlers;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.nosqldb.readserver.database.dao.DocumentDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.Iterator;
 
 /**
  * WriteHandler service is responsible for handling the write requests that come from the
@@ -52,7 +51,7 @@ public class WriteHandler {
     }
 
     private void addDocument(String db, String collection, JsonNode document) throws IOException {
-        dao.getDocuments(db,collection);
+        dao.getCollection(db,collection);
         dao.addDocument(db,collection, (ObjectNode) document);
     }
     private void addCollection(String db, String collection, JsonNode schema) throws IOException {
@@ -60,11 +59,11 @@ public class WriteHandler {
         dao.addCollection(db,collection,schema);
     }
     private void deleteCollection(String db, String collection) throws IOException {
-        dao.getDocuments(db,collection);
+        dao.getCollection(db,collection);
         dao.deleteCollection(db,collection);
     }
     private void deleteDocument(String db, String collection, String doc_ID) throws IOException {
-        dao.getDocuments(db,collection);
+        dao.getCollection(db,collection);
         dao.deleteDocument(db,collection,doc_ID);
     }
     private void setSchema(String db, JsonNode schema) throws IOException {
@@ -79,9 +78,10 @@ public class WriteHandler {
         ((ObjectNode)schema.get(colName).get("properties")).set(attribName,attribute);
         dao.setSchema(db,schema);
         if(attribute.has("required")&&attribute.get("required").asBoolean()) {
-            ArrayNode collection = new ObjectMapper().createArrayNode().addAll(dao.getDocuments(db, colName).values());
-            for(JsonNode i :collection) {
-                ((ObjectNode)i).set(attribName,attribute.get("default"));
+            ObjectNode collection = dao.getCollection(db, colName);
+            for (Iterator<String> it = collection.fieldNames(); it.hasNext(); ) {
+                String i = it.next();
+                ((ObjectNode)collection.get(i)).set(attribName,attribute.get("default"));
             }
             dao.setCollection(db,colName,collection);
         }

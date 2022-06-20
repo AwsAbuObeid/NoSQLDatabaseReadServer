@@ -12,28 +12,27 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 @Service
 public class APIkeyRecord {
-    private static final String Controller_API_key="Controller_API_key";
-    private static  ConcurrentHashMap<String,String> securityKeys;
+    private static final String Controller_API_key = "Controller_API_key";
+    private static ConcurrentHashMap<String, String> securityKeys;
 
     public APIkeyRecord() {
-        securityKeys=new ConcurrentHashMap<>();
+        securityKeys = new ConcurrentHashMap<>();
     }
 
-    public void addKey(String securityKey, String DB){
+    public void addKey(String securityKey, String DB) {
         securityKeys.put(securityKey, DB);
     }
 
-    public boolean isControllerKey(String securityKey){
+    public boolean isControllerKey(String securityKey) {
         return Controller_API_key.equals(securityKey);
     }
 
     public boolean isValidKey(String securityKey) {
-        return securityKeys.containsKey(securityKey)||Controller_API_key.equals(securityKey);
+        return securityKeys.containsKey(securityKey) || isControllerKey(securityKey);
     }
 
     public String startSession(String securityKey) {
-
-        String DB=securityKeys.get(securityKey);
+        String DB = securityKeys.get(securityKey);
         securityKeys.remove(securityKey);
         return DB;
     }

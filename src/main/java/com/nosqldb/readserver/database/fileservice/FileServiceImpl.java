@@ -17,9 +17,6 @@ import java.nio.file.Paths;
 public class FileServiceImpl implements FileService {
     public static final String DATA_PATH = "Data/";
 
-    private FileServiceImpl() {
-    }
-
     @Override
     public File getCollectionFile(String DB, String colName) {
         new File(DATA_PATH + DB).mkdirs();
@@ -33,13 +30,13 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
-    public void deleteCollectionFile(String DB, String colName) {
-        new File(DATA_PATH + DB).mkdirs();
-        new File(DATA_PATH + DB + "/" + colName + ".json").delete();
+    public void deleteDB(String DB) throws IOException {
+        FileUtils.deleteDirectory(new File(DATA_PATH + DB));
     }
 
     @Override
-    public void deleteDB(String DB) throws IOException {
-        FileUtils.deleteDirectory(new File(DATA_PATH + DB));
+    public File getIndexFile(String DB, String colName, String indexName) {
+        new File(DATA_PATH + DB).mkdirs();
+        return Paths.get(DATA_PATH + DB + "/" + colName + "_" + indexName + ".index").toFile();
     }
 }

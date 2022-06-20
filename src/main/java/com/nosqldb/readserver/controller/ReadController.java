@@ -1,5 +1,6 @@
 package com.nosqldb.readserver.controller;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.nosqldb.readserver.config.HttpSessionConfig;
@@ -30,51 +31,110 @@ public class ReadController {
     private APIkeyRecord apIkeyRecord;
     @Autowired
     private ReadHandler readHandler;
-    Logger logger= LoggerFactory.getLogger(ReadController.class);
+    Logger logger = LoggerFactory.getLogger(ReadController.class);
 
-    @PostMapping
-    @RequestMapping(value="/query",consumes="application/json")
-    public ResponseEntity query(HttpSession session,@RequestBody ObjectNode query) {
+    @GetMapping
+    @RequestMapping(value = "/query/{collection}")
+    public ResponseEntity getAll(HttpSession session, @PathVariable String collection) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         String DB = (String) session.getAttribute("DBname");
-        if (DB ==null)
-            return new ResponseEntity(headers,HttpStatus.UNAUTHORIZED);
+        if (DB == null)
+            return new ResponseEntity(headers, HttpStatus.FORBIDDEN);
 
-        ObjectNode ret;
-        try { ret = readHandler.executeQuery(DB,query); }
-        catch (IOException e){
+        JsonNode ret;
+        try {
+            ret = readHandler.getAll(DB, collection);
+        } catch (IOException e) {
             e.printStackTrace();
-            return new ResponseEntity(headers,HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity(headers, HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        return new ResponseEntity(ret,headers,HttpStatus.OK);
+        return new ResponseEntity(ret, headers, HttpStatus.OK);
+    }
+
+    @PostMapping
+    @RequestMapping(value = "/indexQuery/{collection}", consumes = "application/json")
+    public ResponseEntity indexQuery(HttpSession session, @RequestBody ObjectNode index, @PathVariable String collection) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        String DB = (String) session.getAttribute("DBname");
+        if (DB == null)
+            return new ResponseEntity(headers, HttpStatus.FORBIDDEN);
+
+        JsonNode ret;
+        try {
+            ret = readHandler.indexQuery(DB, collection, index);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return new ResponseEntity(headers, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return new ResponseEntity(ret, headers, HttpStatus.OK);
     }
 
     @GetMapping
-    @RequestMapping(value="/authenticate")
-    public ResponseEntity query(HttpSession session)  {
+    @RequestMapping(value = "/idQuery/{collection}/{id}")
+    public ResponseEntity idQuery(HttpSession session, @PathVariable String id, @PathVariable String collection) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        ObjectNode status=new ObjectMapper().createObjectNode();
+        String DB = (String) session.getAttribute("DBname");
+        if (DB == null)
+            return new ResponseEntity(headers, HttpStatus.FORBIDDEN);
 
-        if(session.getAttribute("DBname") ==null){
+        JsonNode ret;
+        try {
+            ret = readHandler.idQuery(DB, collection, id);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return new ResponseEntity(headers, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return new ResponseEntity(ret, headers, HttpStatus.OK);
+    }
+
+    @PostMapping
+    @RequestMapping(value = "/searchQuery/{collection}", consumes = "application/json")
+    public ResponseEntity searchQuery(HttpSession session, @RequestBody ObjectNode index, @PathVariable String collection) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        String DB = (String) session.getAttribute("DBname");
+        if (DB == null)
+            return new ResponseEntity(headers, HttpStatus.FORBIDDEN);
+
+        JsonNode ret;
+        try {
+            ret = readHandler.searchQuery(DB, collection, index);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return new ResponseEntity(headers, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return new ResponseEntity(ret, headers, HttpStatus.OK);
+    }
+
+    @GetMapping
+    @RequestMapping(value = "/authenticate")
+    public ResponseEntity query(HttpSession session) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        ObjectNode status = new ObjectMapper().createObjectNode();
+
+        if (session.getAttribute("DBname") == null) {
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-            String DB= apIkeyRecord.startSession((String) auth.getPrincipal());
-            session.setAttribute("DBname",DB);
+            String DB = apIkeyRecord.startSession((String) auth.getPrincipal());
+            session.setAttribute("DBname", DB);
             status.put("status", "SESSION STARTED");
             status.put("database", DB);
-            logger.info("starting new session on :"+DB);
+            logger.info("starting new session on :" + DB);
             return new ResponseEntity(status, headers, HttpStatus.OK);
         }
         status.put("status", "SESSION ALREADY STARTED");
-        return new ResponseEntity(status,headers,HttpStatus.OK);
+        return new ResponseEntity(status, headers, HttpStatus.OK);
     }
+
     @Autowired
     HttpSessionConfig httpSessionConfig;
 
     @GetMapping
-    @RequestMapping(value="/load")
-    public int yep(){
+    @RequestMapping(value = "/load")
+    public int getLoad() {
         return httpSessionConfig.getNumberOfSessions();
     }
 

@@ -22,40 +22,39 @@ public class WriteController {
     private APIkeyRecord APIkeyRecord;
     @Autowired
     private WriteHandler writeHandler;
-    Logger logger= LoggerFactory.getLogger(WriteController.class);
+    Logger logger = LoggerFactory.getLogger(WriteController.class);
 
     @PostMapping
     @RequestMapping("/write")
     public ResponseEntity write(@RequestBody ObjectNode Body) {
-
         String key = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (!APIkeyRecord.isControllerKey(key))
             return new ResponseEntity(HttpStatus.UNAUTHORIZED);
 
         try {
             writeHandler.executeWrite(Body);
-            logger.info("Executed write command: "+Body.get("op").asText());
-        }catch (Exception e){
+            logger.info("Executed write command: " + Body.get("op").asText());
+        } catch (Exception e) {
             e.printStackTrace();
             return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        return new ResponseEntity("OK",HttpStatus.OK);
+        return new ResponseEntity("OK", HttpStatus.OK);
     }
 
     @PostMapping
     @RequestMapping("/addAPIKey")
-    public ResponseEntity addAPIKey(@RequestBody ObjectNode Body){
+    public ResponseEntity addAPIKey(@RequestBody ObjectNode Body) {
         String key = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (!APIkeyRecord.isControllerKey(key))
             return new ResponseEntity(HttpStatus.UNAUTHORIZED);
         try {
             APIkeyRecord.addKey(Body.get("key").asText(), Body.get("DB").asText());
             logger.info("Added new API key");
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        return new ResponseEntity("OK",HttpStatus.OK);
+        return new ResponseEntity("OK", HttpStatus.OK);
     }
 
 }

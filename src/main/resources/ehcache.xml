@@ -20,5 +20,12 @@
            transactionalMode="off">
         <persistence strategy="none" />
     </cache>
+    <cache name="indexes"
+           eternal="false"
+           maxEntriesLocalHeap="0"
+           memoryStoreEvictionPolicy="LRU"
+           transactionalMode="off">
+        <persistence strategy="none" />
+    </cache>
 
 </ehcache>
