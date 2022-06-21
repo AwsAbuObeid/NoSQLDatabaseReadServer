@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 
@@ -47,7 +49,10 @@ public class ReadHandler {
 
         it = query.fieldNames();
         String firstIndex = it.next();
-        List<String> allObjects = dao.getIndexTable(DB, colName, firstIndex).get(query.get(firstIndex));
+        List<String> allObjectsIndex = dao.getIndexTable(DB, colName, firstIndex).get(query.get(firstIndex));
+        List<String> allObjects = new ArrayList<>();
+        if (allObjectsIndex!=null) allObjects.addAll(allObjectsIndex);
+
         while (it.hasNext()) {
             String index = it.next();
             List<String> objects = dao.getIndexTable(DB, colName, index).get(query.get(index));

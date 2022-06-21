@@ -43,7 +43,7 @@ public class FileDao implements DocumentDao {
 
     @Override
     public Hashtable<JsonNode, List<String>> getIndexTable(String DB, String colName, String indexName) throws IOException {
-        logger.info("Opening File: " + DB + "/" + colName + ".index");
+        logger.info("Opening File: " + DB + "/" + colName + "_" + indexName + ".index");
 
         Hashtable<JsonNode, List<String>> ret = new Hashtable<>();
         File indexFile = fileService.getIndexFile(DB, colName, indexName);
@@ -52,6 +52,7 @@ public class FileDao implements DocumentDao {
             List<String> objects = new ArrayList<>();
             for (JsonNode j : i.get("objects"))
                 objects.add(j.asText());
+
             ret.put(i.get("value"), objects);
         }
         return ret;
@@ -124,12 +125,12 @@ public class FileDao implements DocumentDao {
     public void deleteDocument(String DB, String colName, String doc_ID) throws IOException {
         File collectionFile = fileService.getCollectionFile(DB, colName);
         ObjectNode coll = (ObjectNode) mapper.readTree(collectionFile);
-        coll.remove(doc_ID);
+        ObjectNode document= (ObjectNode) coll.remove(doc_ID);
         mapper.writeValue(collectionFile, coll);
         ObjectNode schema = getSchema(DB);
 
-        for (JsonNode indexName : getSchema(DB).get(colName).get("index")) {
-            JsonNode indexValue = coll.get(doc_ID).get(schema.get(colName).get("index").get(0).asText());
+        for (JsonNode indexName : schema.get(colName).get("index")) {
+            JsonNode indexValue = document.get(indexName.asText());
             if (indexValue == null) continue;
             File indexFile = fileService.getIndexFile(DB, colName, indexName.asText());
             ArrayNode indexTable = (ArrayNode) mapper.readTree(indexFile);

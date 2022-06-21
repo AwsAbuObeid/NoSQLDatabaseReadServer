@@ -35,7 +35,7 @@ public class CachedDao implements DocumentDao {
     @Override
     @Cacheable(value = "indexes", key = "{#DB, #colName,#indexName}")
     public Hashtable<JsonNode, List<String>> getIndexTable(String DB, String colName,String indexName) throws IOException {
-        return dao.getIndexTable(DB, colName,indexName);
+        return dao.getIndexTable(DB, colName, indexName);
     }
 
     @Cacheable(value = "DBInfo")
@@ -46,7 +46,7 @@ public class CachedDao implements DocumentDao {
     @Caching(evict = {
             @CacheEvict(value = "DBInfo", key = "{#DB, #colName}"),
             @CacheEvict(value = "collections", key = "{#DB, #colName}"),
-            @CacheEvict(value = "DBInfo",allEntries = true)
+            @CacheEvict(value = "indexes",allEntries = true)
     })
     public void addDocument(String DB, String colName, ObjectNode document) throws IOException {
         dao.addDocument(DB,colName,document);
@@ -55,7 +55,7 @@ public class CachedDao implements DocumentDao {
     @Caching(evict = {
             @CacheEvict(value = "DBInfo", key = "{#DB, #colName}"),
             @CacheEvict(value = "collections", key = "{#DB, #colName}"),
-            @CacheEvict(value = "DBInfo",allEntries = true)
+            @CacheEvict(value = "indexes",allEntries = true)
     })
     public void deleteDocument(String DB, String colName, String doc_ID) throws IOException {
         dao.deleteDocument( DB, colName, doc_ID);
